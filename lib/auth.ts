@@ -8,14 +8,13 @@
  * - Multi-tenant organization management
  */
 
-import { NextAuthOptions } from 'next-auth';
 import { getEnabledProviders } from './auth/providers';
 import { measureQuery } from './utils/performance';
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   providers: getEnabledProviders(),
   // Use JWT strategy for stateless authentication
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   
@@ -36,7 +35,7 @@ export const authOptions: NextAuthOptions = {
      * @param account - Account information from OAuth provider
      * @returns true if sign in should proceed, false to deny access
      */
-    async signIn({ user, account }) {
+    async signIn({ user, account }: { user: any; account: any }) {
       console.log('🔐 Sign in callback:', { user: user?.email, account: account?.provider });
       
       // Handle OAuth providers (Google, Azure AD)
@@ -94,7 +93,7 @@ export const authOptions: NextAuthOptions = {
      * @param account - Account information from OAuth provider
      * @returns Updated JWT token with organization context
      */
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account }: { token: any; user: any; account: any }) {
       if (user) {
         try {
           const { pool } = await import('./db');
@@ -116,7 +115,7 @@ export const authOptions: NextAuthOptions = {
             () => pool.query(`
               SELECT o.id, o.name, om.role
               FROM app_user u
-              JOIN organization_membership om ON u.id = om.user_id
+              JOIN user_organization om ON u.id = om.user_id
               JOIN organization o ON om.org_id = o.id
               WHERE u.primary_email = $1
             `, [user.email])
@@ -139,7 +138,13 @@ export const authOptions: NextAuthOptions = {
           
           // Set user context
           token.sub = user.id;
-          token.isSuperAdmin = user.id === '00000000-0000-0000-0000-000000000001';
+          
+          // Check if user is super admin from database
+          const superAdminResult = await pool.query(
+            'SELECT is_super_admin FROM app_user WHERE id = $1',
+            [user.id]
+          );
+          token.isSuperAdmin = superAdminResult.rows.length > 0 && superAdminResult.rows[0].is_super_admin === true;
           
         } catch (error) {
           console.error('❌ Error in JWT callback:', error);
@@ -160,7 +165,7 @@ export const authOptions: NextAuthOptions = {
      * @param token - JWT token with organization context
      * @returns Updated session with organization and user ID
      */
-    async session({ session, token }) {
+    async session({ session, token }: { session: any; token: any }) {
       if (token) {
         (session as any).org = token.org;
         (session as any).organizations = token.organizations;

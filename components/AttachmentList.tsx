@@ -41,6 +41,7 @@ export function AttachmentList({
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -53,6 +54,7 @@ export function AttachmentList({
     if (!selectedFile) return;
 
     setUploading(true);
+    setError(null);
     try {
       await onUpload(selectedFile);
       setSelectedFile(null);
@@ -61,6 +63,16 @@ export function AttachmentList({
       if (fileInput) fileInput.value = '';
     } catch (error) {
       console.error('Upload error:', error);
+      
+      // Get detailed error message
+      let errorMessage = 'Upload failed. Please try again.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        console.log('Upload error details:', error);
+      }
+      
+      setError(`❌ ${errorMessage}`);
       errorHandler.handleError(error as Error, { context: 'upload attachment' });
     } finally {
       setUploading(false);
@@ -138,8 +150,23 @@ export function AttachmentList({
             </div>
           )}
         </div>
+        
+        {/* Error Display */}
+        {error && (
+          <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded-md">
+            <div className="text-red-700 text-sm">
+              <strong>Upload Error:</strong> {error}
+            </div>
+            <button 
+              onClick={() => setError(null)}
+              className="mt-2 text-red-600 text-xs underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
       </div>
-
+      
       {/* Attachments List */}
       <div className="space-y-2">
         <h4 className="text-sm font-medium">

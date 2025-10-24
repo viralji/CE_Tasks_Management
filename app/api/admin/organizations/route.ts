@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
 import { errorHandler } from '@/lib/utils/errorHandler';
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           o.created_at,
           COUNT(om.user_id) as member_count
         FROM organization o
-        LEFT JOIN organization_membership om ON om.org_id = o.id
+        LEFT JOIN user_organization om ON om.org_id = o.id
         GROUP BY o.id, o.name, o.created_at
         ORDER BY o.created_at DESC
       `);

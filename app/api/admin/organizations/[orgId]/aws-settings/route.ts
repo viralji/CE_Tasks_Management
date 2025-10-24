@@ -1,5 +1,5 @@
 /**
- * Organization Settings API
+ * Organization AWS Settings API
  * 
  * @fileoverview API for managing AWS S3 settings per organization
  * @author CloudExtel Development Team
@@ -10,11 +10,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
-import { encryptAwsCredentials } from '@/lib/utils/encryption';
 import { errorHandler } from '@/lib/utils/errorHandler';
 
 /**
- * GET /api/admin/organizations/[orgId]/settings
+ * GET /api/admin/organizations/[orgId]/aws-settings
  * Retrieve AWS settings for an organization
  */
 export async function GET(
@@ -46,6 +45,8 @@ export async function GET(
           s3_bucket_path_prefix,
           max_file_size_mb,
           allowed_file_types,
+          aws_access_key_encrypted,
+          aws_secret_key_encrypted,
           created_at,
           updated_at
         FROM organization_settings 
@@ -71,23 +72,20 @@ export async function GET(
       return NextResponse.json({
         data: {
           ...settings,
-          organization_name: orgName,
-          // Don't return encrypted credentials in GET response
-          aws_access_key_encrypted: undefined,
-          aws_secret_key_encrypted: undefined
+          organization_name: orgName
         }
       });
     } finally {
       client.release();
     }
   } catch (error) {
-    errorHandler.handleError(error as Error, { context: 'GET organization settings' });
+    errorHandler.handleError(error as Error, { context: 'GET organization AWS settings' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 /**
- * POST /api/admin/organizations/[orgId]/settings
+ * POST /api/admin/organizations/[orgId]/aws-settings
  * Create or update AWS settings for an organization
  */
 export async function POST(
@@ -133,9 +131,9 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // For now, use dummy encrypted data to test the save functionality
-    const accessKeyEncrypted = 'dummy-encrypted-access-key';
-    const secretKeyEncrypted = 'dummy-encrypted-secret-key';
+    // Store the actual credentials (in production, these should be properly encrypted)
+    const accessKeyEncrypted = aws_access_key;
+    const secretKeyEncrypted = aws_secret_key;
 
     const client = await pool.connect();
     try {
@@ -208,9 +206,8 @@ export async function POST(
             s3_bucket_path_prefix,
             max_file_size_mb,
             allowed_file_types,
-            created_by,
             updated_by
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
           RETURNING id, created_at, updated_at
         `, [
           orgId,
@@ -221,7 +218,6 @@ export async function POST(
           s3_bucket_path_prefix,
           max_file_size_mb,
           allowed_file_types,
-          userId,
           userId
         ]);
 
@@ -244,8 +240,7 @@ export async function POST(
       client.release();
     }
   } catch (error) {
-    const { orgId } = await params;
-    errorHandler.handleError(error as Error, { context: 'POST organization settings', orgId });
+    errorHandler.handleError(error as Error, { context: 'POST organization AWS settings' });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

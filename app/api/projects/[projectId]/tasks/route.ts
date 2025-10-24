@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { getTasksByStatus, createTask, assignUsersToTask } from '@/lib/data/tasks';
 import { getProjectSettings, checkProjectAccess } from '@/lib/data/projects';
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
   console.log('Task listing API:', { projectId, orgId });
   
   try {
-    const tasks = await getTasksByStatus(orgId, projectId);
+    const tasks = await getTasksByStatus(orgId, projectId, userId, isSuperAdmin);
     console.log('Tasks found:', tasks);
     const grouped = { OPEN: [], IN_PROGRESS: [], BLOCKED: [], DONE: [], CANCELED: [] } as Record<string, any[]>;
     for (const t of tasks) grouped[t.status]?.push(t);

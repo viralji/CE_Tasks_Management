@@ -18,7 +18,7 @@ interface Project {
   description?: string;
 }
 
-export default function ProjectEdit({ params }: { params: Promise<{ projectId: string }> }) {
+export default function ProjectEdit({ params }: { params: { projectId: string } }) {
   const [projectId, setProjectId] = useState<string>('');
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,11 +37,11 @@ export default function ProjectEdit({ params }: { params: Promise<{ projectId: s
   });
 
   useEffect(() => {
-    params.then(({ projectId }) => {
-      setProjectId(projectId);
-      fetchProject(projectId);
-    });
-  }, [params]);
+    if (params.projectId) {
+      setProjectId(params.projectId);
+      fetchProject(params.projectId);
+    }
+  }, [params.projectId]);
 
   const fetchProject = async (id: string) => {
     setLoading(true);

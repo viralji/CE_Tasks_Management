@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
           '[]'::json
         ) as organizations
       FROM app_user u
-      LEFT JOIN organization_membership om ON u.id = om.user_id
+      LEFT JOIN user_organization om ON u.id = om.user_id
       LEFT JOIN organization o ON om.org_id = o.id
       GROUP BY u.id, u.name, u.primary_email, u.image, u.created_at
       ORDER BY u.created_at DESC

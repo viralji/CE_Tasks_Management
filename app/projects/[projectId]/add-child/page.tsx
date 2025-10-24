@@ -18,7 +18,7 @@ interface Project {
   description?: string;
 }
 
-export default function AddChildProject({ params }: { params: Promise<{ projectId: string }> }) {
+export default function AddChildProject({ params }: { params: { projectId: string } }) {
   const [projectId, setProjectId] = useState<string>('');
   const [parentProject, setParentProject] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
@@ -27,11 +27,11 @@ export default function AddChildProject({ params }: { params: Promise<{ projectI
   const { data: session } = useSession();
 
   useEffect(() => {
-    params.then(({ projectId }) => {
-      setProjectId(projectId);
-      fetchParentProject(projectId);
-    });
-  }, [params]);
+    if (params.projectId) {
+      setProjectId(params.projectId);
+      fetchParentProject(params.projectId);
+    }
+  }, [params.projectId]);
 
   const fetchParentProject = async (id: string) => {
     if (!session) return;

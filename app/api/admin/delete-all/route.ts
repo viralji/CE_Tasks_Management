@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
 export async function DELETE(req: NextRequest) {
@@ -32,7 +32,7 @@ export async function DELETE(req: NextRequest) {
       await client.query('DELETE FROM project WHERE org_id = $1', [(session as any).org]);
       
       // Delete all users except admin
-      await client.query('DELETE FROM organization_membership WHERE user_id != $1', ['00000000-0000-0000-0000-000000000001']);
+      await client.query('DELETE FROM user_organization WHERE user_id != $1', ['00000000-0000-0000-0000-000000000001']);
       await client.query('DELETE FROM app_user WHERE id != $1', ['00000000-0000-0000-0000-000000000001']);
 
       // Commit transaction

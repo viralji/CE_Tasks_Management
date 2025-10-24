@@ -38,7 +38,7 @@ interface User {
   primary_email: string;
 }
 
-export default function ProjectSettings({ params }: { params: Promise<{ projectId: string }> }) {
+export default function ProjectSettings({ params }: { params: { projectId: string } }) {
   const [projectId, setProjectId] = useState<string>('');
   const [project, setProject] = useState<Project | null>(null);
   const [settings, setSettings] = useState<Settings>({
@@ -58,11 +58,11 @@ export default function ProjectSettings({ params }: { params: Promise<{ projectI
   const { data: session } = useSession();
 
   useEffect(() => {
-    params.then(({ projectId }) => {
-      setProjectId(projectId);
-      fetchProjectData(projectId);
-    });
-  }, [params]);
+    if (params.projectId) {
+      setProjectId(params.projectId);
+      fetchProjectData(params.projectId);
+    }
+  }, [params.projectId]);
 
   const fetchProjectData = async (id: string) => {
     if (!session) return;

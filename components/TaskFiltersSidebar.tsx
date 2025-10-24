@@ -41,7 +41,7 @@ export function TaskFiltersSidebar() {
           setTasks(tasksData);
           
           // Set all unique projects as selected by default
-          const uniqueProjects = Array.from(new Set(tasksData.map(task => task.project_name).filter(Boolean))).sort();
+          const uniqueProjects = Array.from(new Set(tasksData.map((task: any) => task.project_name).filter(Boolean))).sort() as string[];
           setProjectFilter(uniqueProjects);
           setInitialized(true);
         }
@@ -160,10 +160,10 @@ export function TaskFiltersSidebar() {
               <label key={project} className="flex items-center gap-2 text-xs cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={projectFilter.includes(project)}
+                  checked={projectFilter.includes(project || '')}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setProjectFilter([...projectFilter, project]);
+                      setProjectFilter([...projectFilter, project || '']);
                     } else {
                       setProjectFilter(projectFilter.filter(p => p !== project));
                     }

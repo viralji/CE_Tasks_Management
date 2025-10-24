@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { checkProjectAccess } from '@/lib/data/projects';
 
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
             u.name,
             u.primary_email
           FROM app_user u
-          JOIN organization_membership om ON u.id = om.user_id
+          JOIN user_organization om ON u.id = om.user_id
           WHERE om.org_id = $1 
           AND u.id NOT IN (
             SELECT pm.user_id FROM project_member pm 

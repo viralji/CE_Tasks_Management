@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { getProject, updateProject, checkProjectAccess, deleteProject } from '@/lib/data/projects';
 import { listProjectMembers } from '@/lib/data/members';
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
     const members = await listProjectMembers(orgId, projectId);
     
     // Get tasks grouped by status
-    const tasks = await getTasksByStatus(orgId, projectId);
+    const tasks = await getTasksByStatus(orgId, projectId, userId, isSuperAdmin);
     const taskCounts = {
       OPEN: 0,
       IN_PROGRESS: 0,

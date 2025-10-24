@@ -128,7 +128,9 @@ export function TaskDetailClient({
       await fetchAttachments(); // Refresh attachments list
     } else {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to upload attachment');
+      const errorMessage = error.error || error.message || 'Failed to upload attachment';
+      const details = error.details ? ` | Details: ${error.details}` : '';
+      throw new Error(`${errorMessage}${details}`);
     }
   };
 

@@ -54,7 +54,7 @@ export async function getUserWithOrganizations(email: string) {
           u.id, u.name, u.primary_email, u.image,
           o.id as org_id, o.name as org_name, om.role
         FROM app_user u
-        LEFT JOIN organization_membership om ON u.id = om.user_id
+        LEFT JOIN user_organization om ON u.id = om.user_id
         LEFT JOIN organization o ON om.org_id = o.id
         WHERE u.primary_email = $1
       `, [email]);
@@ -102,7 +102,7 @@ export async function getAllUsersWithOrganizations() {
             '[]'::json
           ) as organizations
         FROM app_user u
-        LEFT JOIN organization_membership om ON u.id = om.user_id
+        LEFT JOIN user_organization om ON u.id = om.user_id
         LEFT JOIN organization o ON om.org_id = o.id
         GROUP BY u.id, u.name, u.primary_email, u.image, u.created_at
         ORDER BY u.created_at DESC
@@ -127,14 +127,14 @@ export async function assignUserToOrganizations(
     
     // Remove existing memberships
     await client.query(
-      'DELETE FROM organization_membership WHERE user_id = $1',
+      'DELETE FROM user_organization WHERE user_id = $1',
       [userId]
     );
     
     // Add new memberships
     for (const orgId of organizationIds) {
       await client.query(`
-        INSERT INTO organization_membership (user_id, org_id, role, created_at)
+        INSERT INTO user_organization (user_id, org_id, role, created_at)
         VALUES ($1, $2, $3, NOW())
       `, [userId, orgId, role]);
     }
@@ -157,7 +157,7 @@ export async function assignUserToOrganizations(
  */
 export async function removeUserFromAllOrganizations(userId: string) {
   const result = await pool.query(
-    'DELETE FROM organization_membership WHERE user_id = $1',
+    'DELETE FROM user_organization WHERE user_id = $1',
     [userId]
   );
   
@@ -176,7 +176,7 @@ export async function getUserOrganizations(userId: string) {
     async () => {
       const result = await pool.query(`
         SELECT o.id, o.name, om.role
-        FROM organization_membership om
+        FROM user_organization om
         JOIN organization o ON om.org_id = o.id
         WHERE om.user_id = $1
         ORDER BY o.name

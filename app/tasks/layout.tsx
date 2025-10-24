@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import Link from 'next/link';
 import { ProjectLayoutClient } from '@/components/ProjectLayoutClient';
@@ -28,7 +28,7 @@ export default async function TasksLayout({ children }: { children: ReactNode })
         if (isSuperAdmin) {
           userName = 'System Administrator';
         } else {
-          const userResult = await client.query('SELECT name FROM app_user WHERE id = $1', [session.user?.id]);
+          const userResult = await client.query('SELECT name FROM app_user WHERE id = $1', [(session as any).user?.id]);
           if (userResult.rows.length > 0) {
             userName = userResult.rows[0].name;
           }

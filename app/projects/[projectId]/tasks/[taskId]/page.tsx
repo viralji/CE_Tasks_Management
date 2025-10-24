@@ -1,4 +1,4 @@
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { TaskDetailClient } from './TaskDetailClient';
 
@@ -72,8 +72,8 @@ export default async function TaskDetail({ params }: { params: Promise<{ project
           au.primary_email as created_by_user_email
         FROM task t
         LEFT JOIN app_user au ON t.created_by = au.id
-        WHERE t.id = $1 AND t.deleted_at IS NULL
-      `, [taskId]);
+        WHERE t.id = $1 AND t.org_id = $2 AND t.deleted_at IS NULL
+      `, [taskId, orgId]);
 
       if (taskResult.rows.length === 0) {
         return (

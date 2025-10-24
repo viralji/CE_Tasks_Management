@@ -18,6 +18,8 @@ interface AwsSettings {
   s3_bucket_path_prefix: string;
   max_file_size_mb: number;
   allowed_file_types: string[] | null;
+  aws_access_key_encrypted?: string;
+  aws_secret_key_encrypted?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -75,8 +77,8 @@ export default function AdminOrgsPage() {
             setAwsSettings(data.data);
             if (data.data) {
               setFormData({
-                aws_access_key: '',
-                aws_secret_key: '',
+                aws_access_key: data.data.aws_access_key_encrypted || '',
+                aws_secret_key: data.data.aws_secret_key_encrypted || '',
                 s3_bucket_name: data.data.s3_bucket_name || '',
                 s3_region: data.data.s3_region || 'ap-south-1',
                 s3_bucket_path_prefix: data.data.s3_bucket_path_prefix || '',
@@ -235,7 +237,7 @@ export default function AdminOrgsPage() {
                       AWS Access Key
                     </label>
                     <input
-                      type="password"
+                      type="text"
                       value={formData.aws_access_key}
                       onChange={(e) => setFormData(prev => ({ ...prev, aws_access_key: e.target.value }))}
                       className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -247,7 +249,7 @@ export default function AdminOrgsPage() {
                       AWS Secret Key
                     </label>
                     <input
-                      type="password"
+                      type="text"
                       value={formData.aws_secret_key}
                       onChange={(e) => setFormData(prev => ({ ...prev, aws_secret_key: e.target.value }))}
                       className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -273,16 +275,13 @@ export default function AdminOrgsPage() {
                     <label className="block text-sm font-medium text-text-base mb-1">
                       S3 Region
                     </label>
-                    <select
+                    <input
+                      type="text"
                       value={formData.s3_region}
                       onChange={(e) => setFormData(prev => ({ ...prev, s3_region: e.target.value }))}
                       className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="ap-south-1">Asia Pacific (Mumbai)</option>
-                      <option value="us-east-1">US East (N. Virginia)</option>
-                      <option value="us-west-2">US West (Oregon)</option>
-                      <option value="eu-west-1">Europe (Ireland)</option>
-                    </select>
+                      placeholder="us-east-1"
+                    />
                   </div>
                 </div>
 

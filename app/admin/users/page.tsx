@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => {
-    if (session?.user?.isSuperAdmin) {
+    if ((session as any)?.user?.isSuperAdmin) {
       fetchUsers();
       fetchOrganizations();
     } else if (session) {

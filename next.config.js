@@ -1,10 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
+  
+  // Disable experimental features that cause build issues
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
   
   // Security headers
   async headers() {
@@ -35,14 +39,6 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
 
-  // Experimental features
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb'
-    },
-    optimizeCss: true,
-  },
-
   // Webpack optimization
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -53,9 +49,15 @@ const nextConfig = {
         tls: false,
       };
     }
+    
+    // Fix for Next.js 15 compatibility
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'next-flight-client-entry-loader': false,
+    };
+    
     return config;
   },
 };
 
 module.exports = nextConfig;
-

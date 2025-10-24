@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth from 'next-auth/next';
 
 declare module 'next-auth' {
   interface Session {
@@ -16,6 +16,14 @@ declare module 'next-auth' {
       role: string;
     }>;
     needsOrgAssignment?: boolean;
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    name: string;
+    image?: string;
+    isSuperAdmin?: boolean;
   }
 
   interface JWT {

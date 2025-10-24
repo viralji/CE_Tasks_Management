@@ -88,7 +88,7 @@ export const decryptAwsCredentials = (accessKeyEncrypted: string, secretKeyEncry
  * @returns 32-character hex string suitable for ENCRYPTION_KEY
  */
 export const generateEncryptionKey = (): string => {
-  return crypto.randomBytes(32).toString('hex');
+  return require('crypto').randomBytes(32).toString('hex');
 };
 
 /**

@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
 import { uploadFile, generateSignedUrl } from '@/lib/aws/s3';
@@ -116,7 +116,11 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ 
+        error: 'Authentication required', 
+        message: 'Please log in to upload files. Go to /signin to log in.',
+        code: 'AUTH_REQUIRED'
+      }, { status: 401 });
     }
 
     const { taskId } = await params;
@@ -141,7 +145,11 @@ export async function POST(
       // Check task access
       const hasAccess = await checkTaskAccess(orgId, taskId, userId, isSuperAdmin);
       if (!hasAccess) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        return NextResponse.json({ 
+          error: 'Access denied', 
+          message: 'You do not have permission to upload files to this task. Contact your administrator.',
+          code: 'ACCESS_DENIED'
+        }, { status: 403 });
       }
 
       // Parse multipart form data
@@ -161,7 +169,9 @@ export async function POST(
 
       if (settingsResult.rows.length === 0) {
         return NextResponse.json({ 
-          error: 'AWS S3 configuration not found for organization' 
+          error: 'Upload configuration missing', 
+          message: 'File upload is not configured for this organization. Contact your administrator to set up AWS S3 credentials.',
+          code: 'UPLOAD_CONFIG_MISSING'
         }, { status: 400 });
       }
 
@@ -242,10 +252,11 @@ export async function POST(
           original_filename,
           file_size,
           file_type,
+          mime_type,
           s3_key,
           s3_bucket,
           uploaded_by
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING id, uploaded_at
       `, [
         orgId,
@@ -254,6 +265,7 @@ export async function POST(
         file.name, // original_filename
         file.size,
         file.type,
+        file.type, // mime_type
         uploadResult.key,
         uploadResult.bucket,
         userId
@@ -297,8 +309,9 @@ export async function POST(
     
     errorHandler.handleError(error as Error, { context: 'POST task attachment', taskId });
     return NextResponse.json({ 
-      error: 'Internal server error',
-      details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      error: 'Upload failed',
+      message: (error as Error).message,
+      details: process.env.NODE_ENV === 'development' ? (error as Error).stack : undefined
     }, { status: 500 });
   }
 }

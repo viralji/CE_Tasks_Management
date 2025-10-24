@@ -13,24 +13,53 @@ export async function listTasksByProject(orgId: string, projectId: string) {
   });
 }
 
-export async function getTasksByStatus(orgId: string, projectId: string) {
+export async function getTasksByStatus(orgId: string, projectId: string, userId?: string, isSuperAdmin?: boolean) {
   return withOrg(orgId, async (client) => {
-    const { rows } = await client.query(
-      `SELECT id, title, status, priority, description, due_at, created_by, created_at, updated_at
-       FROM task 
-       WHERE org_id = $1 AND project_id = $2 AND deleted_at IS NULL 
-       ORDER BY 
-         CASE status 
-           WHEN 'OPEN' THEN 1
-           WHEN 'IN_PROGRESS' THEN 2
-           WHEN 'BLOCKED' THEN 3
-           WHEN 'DONE' THEN 4
-           WHEN 'CANCELED' THEN 5
-         END,
-         created_at DESC`,
-      [orgId, projectId]
-    );
-    return rows;
+    // If user is super admin, return all tasks
+    if (isSuperAdmin) {
+      const { rows } = await client.query(
+        `SELECT id, title, status, priority, description, due_at, created_by, created_at, updated_at
+         FROM task 
+         WHERE org_id = $1 AND project_id = $2 AND deleted_at IS NULL 
+         ORDER BY 
+           CASE status 
+             WHEN 'OPEN' THEN 1
+             WHEN 'IN_PROGRESS' THEN 2
+             WHEN 'BLOCKED' THEN 3
+             WHEN 'DONE' THEN 4
+             WHEN 'CANCELED' THEN 5
+           END,
+           created_at DESC`,
+        [orgId, projectId]
+      );
+      return rows;
+    }
+
+    // For regular users, only return tasks assigned to them
+    if (userId) {
+      const { rows } = await client.query(
+        `SELECT t.id, t.title, t.status, t.priority, t.description, t.due_at, t.created_by, t.created_at, t.updated_at
+         FROM task t
+         LEFT JOIN task_assignment ta ON t.id = ta.task_id AND t.org_id = ta.org_id
+         WHERE t.org_id = $1 AND t.project_id = $2 AND t.deleted_at IS NULL 
+         AND (ta.user_id = $3 OR t.created_by = $3)
+         GROUP BY t.id, t.title, t.status, t.priority, t.description, t.due_at, t.created_by, t.created_at, t.updated_at
+         ORDER BY 
+           CASE t.status 
+             WHEN 'OPEN' THEN 1
+             WHEN 'IN_PROGRESS' THEN 2
+             WHEN 'BLOCKED' THEN 3
+             WHEN 'DONE' THEN 4
+             WHEN 'CANCELED' THEN 5
+           END,
+           t.created_at DESC`,
+        [orgId, projectId, userId]
+      );
+      return rows;
+    }
+
+    // Fallback: return empty array if no user specified
+    return [];
   });
 }
 

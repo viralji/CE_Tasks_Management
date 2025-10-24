@@ -26,7 +26,7 @@ interface Settings {
   notificationEnabled: boolean;
 }
 
-export default function ProjectDetail({ params }: { params: Promise<{ projectId: string }> }) {
+export default function ProjectDetail({ params }: { params: { projectId: string } }) {
   const [projectId, setProjectId] = useState<string>('');
   const [project, setProject] = useState<Project | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -38,13 +38,13 @@ export default function ProjectDetail({ params }: { params: Promise<{ projectId:
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    params.then(({ projectId }) => {
-      setProjectId(projectId);
+    if (params.projectId) {
+      setProjectId(params.projectId);
       if (session) {
-        fetchProjectData(projectId);
+        fetchProjectData(params.projectId);
       }
-    });
-  }, [params, session]);
+    }
+  }, [params.projectId, session]);
 
   const fetchProjectData = async (id: string) => {
     if (!session) return;

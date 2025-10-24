@@ -55,7 +55,7 @@ export async function listUsersNotInProject(orgId: string, projectId: string) {
     const { rows } = await client.query(
       `SELECT u.id, u.primary_email, u.name, u.image
        FROM app_user u
-       JOIN organization_membership om ON om.user_id = u.id
+       JOIN user_organization om ON om.user_id = u.id
        WHERE om.org_id = $1 
        AND u.id NOT IN (
          SELECT pm.user_id FROM project_member pm 

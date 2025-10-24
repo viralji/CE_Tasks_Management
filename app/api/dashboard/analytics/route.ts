@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authOptions } from '@/lib/auth';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { withOrg } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
           u.primary_email as email,
           COUNT(t.id) as open_tasks
         FROM app_user u
-        JOIN organization_membership om ON om.user_id = u.id
+        JOIN user_organization om ON om.user_id = u.id
         LEFT JOIN task_assignment ta ON ta.user_id = u.id
         LEFT JOIN task t ON t.id = ta.task_id AND t.status IN ('OPEN', 'IN_PROGRESS', 'BLOCKED') AND t.deleted_at IS NULL
         WHERE om.org_id = $1
@@ -185,7 +185,7 @@ export async function GET(req: NextRequest) {
     console.error('Error fetching dashboard analytics:', error);
     return NextResponse.json({ 
       error: 'Failed to fetch analytics',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
     }, { status: 500 });
   }
 }

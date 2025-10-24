@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
 /**
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`📋 User ${session.user?.email} switching to organization ${organizationId}`);
+    console.log(`📋 User ${(session as any).user?.email} switching to organization ${organizationId}`);
 
     // The actual organization switching is handled by the session update
     // in the client-side component. This endpoint is for validation.

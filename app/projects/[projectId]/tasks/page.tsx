@@ -40,7 +40,7 @@ interface Task {
   updated_at: string;
 }
 
-export default function ProjectTasks({ params }: { params: Promise<{ projectId: string }> }) {
+export default function ProjectTasks({ params }: { params: { projectId: string } }) {
   const [projectId, setProjectId] = useState<string>('');
   const [project, setProject] = useState<Project | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -49,10 +49,10 @@ export default function ProjectTasks({ params }: { params: Promise<{ projectId: 
   const { data: session, status: sessionStatus } = useSession();
 
   useEffect(() => {
-    params.then(({ projectId }) => {
-      setProjectId(projectId);
-    });
-  }, [params]);
+    if (params.projectId) {
+      setProjectId(params.projectId);
+    }
+  }, [params.projectId]);
 
   // Fetch data when session becomes available
   useEffect(() => {

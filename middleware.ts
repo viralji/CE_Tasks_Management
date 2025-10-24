@@ -29,7 +29,7 @@ export default withAuth(
     }
 
     // Check if user needs to select organization
-    if (token.organizations && token.organizations.length > 1 && !token.org) {
+    if (token.organizations && (token.organizations as any).length > 1 && !token.org) {
       if (pathname !== '/select-organization') {
         return NextResponse.redirect(new URL('/select-organization', req.url));
       }
@@ -37,7 +37,7 @@ export default withAuth(
     }
 
     // Check if user has no organizations and is not on pending page
-    if (token.organizations && token.organizations.length === 0) {
+    if (token.organizations && (token.organizations as any).length === 0) {
       if (pathname !== '/pending-access') {
         return NextResponse.redirect(new URL('/pending-access', req.url));
       }

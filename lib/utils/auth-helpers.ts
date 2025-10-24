@@ -4,7 +4,7 @@
  * Reusable authentication utilities for consistent auth handling
  */
 
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { NextRequest } from 'next/server';
 
@@ -67,10 +67,9 @@ export async function requireSuperAdmin(): Promise<AuthResult> {
  * Get client IP for rate limiting
  */
 export function getClientIP(request: NextRequest): string {
-  return request.ip || 
-         request.headers.get('x-forwarded-for')?.split(',')[0] || 
-         request.headers.get('x-real-ip') || 
-         'unknown';
+  return request.headers.get('x-forwarded-for')?.split(',')[0] || 
+          request.headers.get('x-real-ip') || 
+          'unknown';
 }
 
 /**

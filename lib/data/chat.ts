@@ -137,7 +137,7 @@ export async function sendMessage(orgId: string, roomId: string, authorId: strin
     // Extract mentions and create mention records
     const mentions = extractMentions(content);
     if (mentions.length > 0) {
-      await createMentions(orgId, messageId, mentions, client);
+      await createMentions(orgId, messageId, mentions, client, roomId, authorId);
     }
     
     return message[0];
@@ -158,7 +158,7 @@ export function extractMentions(content: string): string[] {
 /**
  * Create mention records for a message
  */
-export async function createMentions(orgId: string, messageId: string, usernames: string[], client: any) {
+export async function createMentions(orgId: string, messageId: string, usernames: string[], client: any, roomId?: string, mentionedBy?: string) {
   for (const username of usernames) {
     // Look up user by email (assuming @username format matches email)
     const email = `${username}@cloudextel.com`;
@@ -169,10 +169,10 @@ export async function createMentions(orgId: string, messageId: string, usernames
     
     if (userRows.length > 0) {
       await client.query(
-        `INSERT INTO chat_mention (org_id, message_id, mentioned_user_id, created_at)
-         VALUES ($1, $2, $3, NOW())
-         ON CONFLICT (org_id, message_id, mentioned_user_id) DO NOTHING`,
-        [orgId, messageId, userRows[0].id]
+        `INSERT INTO chat_mention (org_id, room_id, message_id, mentioned_user_id, mentioned_by, created_at)
+         VALUES ($1, $2, $3, $4, $5, NOW())
+         ON CONFLICT (org_id, room_id, message_id, mentioned_user_id) DO NOTHING`,
+        [orgId, roomId, messageId, userRows[0].id, mentionedBy]
       );
     }
   }

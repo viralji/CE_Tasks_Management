@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
 import { orgAssignmentSchema, validateUUID, apiRateLimiter } from '@/lib/utils/validation';
@@ -20,7 +20,7 @@ export async function POST(
 ) {
   try {
     // Rate limiting
-    const clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     if (!apiRateLimiter.isAllowed(clientIP)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
@@ -66,14 +66,14 @@ export async function POST(
 
       // Remove existing organization memberships
       await client.query(
-        'DELETE FROM organization_membership WHERE user_id = $1',
+        'DELETE FROM user_organization WHERE user_id = $1',
         [userId]
       );
 
       // Add new organization memberships
       for (const orgId of organizationIds) {
         await client.query(`
-          INSERT INTO organization_membership (org_id, user_id, role)
+          INSERT INTO user_organization (org_id, user_id, role)
           VALUES ($1, $2, $3::membership_role)
           ON CONFLICT (org_id, user_id) DO UPDATE SET role = $3::membership_role
         `, [orgId, userId, role]);
@@ -135,7 +135,7 @@ export async function DELETE(
 
     // Remove all organization memberships
     const result = await pool.query(
-      'DELETE FROM organization_membership WHERE user_id = $1',
+      'DELETE FROM user_organization WHERE user_id = $1',
       [userId]
     );
 
