@@ -1,0 +1,52 @@
+{
+  "name": "s3-attachments-plugin",
+  "version": "1.0.0",
+  "description": "A complete, modular S3 file attachment system for Next.js applications with multi-tenant support",
+  "main": "S3AttachmentManager.ts",
+  "keywords": [
+    "s3",
+    "attachments",
+    "nextjs",
+    "aws",
+    "file-upload",
+    "multi-tenant",
+    "plugin"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/s3-request-presigner": "^3.0.0",
+    "pg": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "next": ">=13.0.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "files": [
+    "S3AttachmentManager.ts",
+    "components/",
+    "api/",
+    "database/",
+    "examples/",
+    "README.md",
+    "setup.sh"
+  ],
+  "scripts": {
+    "setup": "./setup.sh",
+    "test": "echo 'No tests specified' && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/s3-attachments-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/s3-attachments-plugin/issues"
+  },
+  "homepage": "https://github.com/your-username/s3-attachments-plugin#readme"
+}

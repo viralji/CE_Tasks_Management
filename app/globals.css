@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body { 
+  height: 100%; 
+  background-color: #FFFFFF;
+  color: #1E3A8A;
+}
+
+/* Professional Light Theme Base Styles */
+* {
+  transition: all 150ms ease-in-out;
+}
+
+/* Utility Classes for Consistent Styling */
+.page-title { 
+  @apply text-xl font-bold text-text-base;
+}
+
+.section-header { 
+  @apply text-sm font-semibold text-text-base mb-2;
+}
+
+.card-standard { 
+  @apply bg-panel border border-border rounded-md p-3 shadow-sm;
+}
+
+.btn-primary { 
+  @apply px-3 py-1.5 bg-primary text-primary-fg rounded-md text-sm font-medium hover:bg-primary/90 transition-all duration-150;
+}
+
+.btn-secondary { 
+  @apply px-3 py-1.5 bg-subtle text-text-base rounded-md text-sm font-medium hover:bg-hover transition-all duration-150;
+}
+
+.btn-danger { 
+  @apply px-3 py-1.5 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-all duration-150;
+}
+
+.nav-item { 
+  @apply block px-3 py-2 rounded text-sm text-text-muted hover:text-text-base hover:bg-hover transition-all duration-150;
+}
+
+.list-item { 
+  @apply flex items-center h-8 px-3 py-1 text-sm text-text-base hover:bg-hover transition-all duration-150;
+}
+
+/* Compact defaults - updated for light theme */
+.btn { 
+  @apply px-3 py-1.5 rounded-md text-sm transition-all duration-150;
+}
+
+.card { 
+  @apply bg-panel border border-border rounded-md p-3 shadow-sm;
+}
+
+/* Status Badge Styles */
+.status-active { @apply bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.status-planning { @apply bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.status-at-risk { @apply bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.status-on-hold { @apply bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.status-completed { @apply bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.status-canceled { @apply bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+
+.priority-low { @apply bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.priority-medium { @apply bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.priority-high { @apply bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+.priority-critical { @apply bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs font-medium; }
+
+/* Form Elements */
+.form-input {
+  @apply w-full px-3 py-2 border border-border rounded-md text-sm text-text-base bg-bg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-150;
+}
+
+.form-select {
+  @apply w-full px-3 py-2 border border-border rounded-md text-sm text-text-base bg-bg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-150;
+}
+
+/* Sidebar Styles */
+.sidebar-left {
+  @apply w-64 border-r border-border bg-panel;
+}
+
+.sidebar-right {
+  @apply w-64 border-l border-border bg-panel;
+}
+
+/* Smooth Transitions */
+.smooth-transition {
+  @apply transition-all duration-150 ease-in-out;
+}
+
+/* Project Access Control Styles */
+.project-card-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Enhanced styling for inaccessible projects */
+.project-no-access {
+  background-color: #f5f5f5 !important;
+  border-color: #d1d5db !important;
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.project-no-access .project-name {
+  color: #6b7280 !important;
+  /* Removed text-decoration: line-through; */
+}
+
+.project-no-access:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #d1d5db !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+
