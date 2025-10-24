@@ -142,8 +142,8 @@ ALTER USER noclick_user CREATEDB;
 ### 3.2 Set Up Schema
 ```bash
 # Create application directory
-mkdir -p /var/www/noclick
-cd /var/www/noclick
+mkdir -p /var/www/CE_Tasks_Management
+cd /var/www/CE_Tasks_Management
 
 # Upload your code here (see Step 4)
 # Then run:
@@ -157,12 +157,12 @@ PGPASSWORD=postgres psql -h localhost -U postgres -f db/complete-schema.sql
 ### 4.1 Upload Code
 ```bash
 # Upload your code to server
-scp -r CE_Tasks_Management/* root@YOUR_SERVER_IP:/var/www/noclick/
+scp -r CE_Tasks_Management/* root@YOUR_SERVER_IP:/var/www/CE_Tasks_Management/
 ```
 
 ### 4.2 Install Dependencies
 ```bash
-cd /var/www/noclick
+cd /var/www/CE_Tasks_Management
 npm install
 ```
 
@@ -293,7 +293,7 @@ certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ### 7.1 Start with PM2
 ```bash
 # Start application
-pm2 start npm --name "noclick" -- start
+pm2 start npm --name "CE_Tasks_Management" -- start
 
 # Save PM2 configuration
 pm2 save
@@ -348,10 +348,10 @@ htop
 **1. Application won't start:**
 ```bash
 # Check logs
-pm2 logs noclick
+pm2 logs CE_Tasks_Management
 
 # Restart application
-pm2 restart noclick
+pm2 restart CE_Tasks_Management
 ```
 
 **2. Database connection issues:**
@@ -384,10 +384,10 @@ certbot renew --dry-run
 pm2 status
 
 # View application logs
-pm2 logs noclick
+pm2 logs CE_Tasks_Management
 
 # Restart application
-pm2 restart noclick
+pm2 restart CE_Tasks_Management
 
 # Check Nginx status
 systemctl status nginx

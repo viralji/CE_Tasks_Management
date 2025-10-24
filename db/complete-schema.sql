@@ -413,6 +413,13 @@ INSERT INTO organization (slug, name) VALUES ('cloudextel','CloudExtel') ON CONF
 INSERT INTO app_user (name, primary_email) VALUES ('Admin User', 'admin@admin.com') ON CONFLICT (primary_email) DO NOTHING;
 UPDATE app_user SET is_super_admin = TRUE WHERE primary_email = 'admin@admin.com';
 
+-- Assign admin user to CloudExtel organization
+INSERT INTO user_organization (user_id, org_id, role) 
+SELECT u.id, o.id, 'ADMIN' 
+FROM app_user u, organization o 
+WHERE u.primary_email = 'admin@admin.com' AND o.slug = 'cloudextel'
+ON CONFLICT (user_id, org_id) DO UPDATE SET role = 'ADMIN';
+
 -- Setup organization settings for upload functionality
 INSERT INTO organization_settings (org_id, max_file_size_mb, allowed_file_types, aws_access_key_encrypted, aws_secret_key_encrypted, s3_bucket_name, s3_region, s3_bucket_path_prefix) 
 SELECT id, 50, NULL, 'demo-access-key', 'demo-secret-key', 'demo-bucket', 'us-east-1', 'uploads/' 
